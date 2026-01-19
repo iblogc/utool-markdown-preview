@@ -1,0 +1,30 @@
+{
+  "main": "index.html",
+  "logo": "logo.png",
+  "preload": "preload.js",
+  "features": [
+    {
+      "code": "mdPreview1",
+      "explain": "Markdown 预览",
+      "cmds": [
+        "md预览",
+        "markdown预览"
+      ],
+      "mainHide": true
+    },
+    {
+      "code": "mdPreview2",
+      "explain": "Markdown 预览",
+      "cmds": [
+        {
+          "type": "over",
+          "label": "Markdown 预览",
+          "minLength": 1,
+          "maxLength": 999999
+        }
+      ],
+      "mainHide": true
+    }
+  ],
+  "aiTaskId": "b1ba3ac5-b1f9-4a5b-84be-1ab64b27bf19"
+}
