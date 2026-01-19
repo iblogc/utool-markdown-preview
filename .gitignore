@@ -11,7 +11,7 @@ yarn-error.log*
 .eslintcache
 
 # Project
-dist/
+# dist/
 .temp/
 .upx/
 

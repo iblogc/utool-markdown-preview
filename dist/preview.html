@@ -18,26 +18,17 @@
       }
       .toolbar {
         position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 44px;
+        top: 16px;
+        right: 16px;
         display: flex;
         align-items: center;
-        padding: 0 16px;
         gap: 8px;
-        border-bottom: 1px solid;
         z-index: 1000;
       }
-      .toolbar.dark {
-        background-color: #161b22;
-        border-color: #30363d;
-        color: #c9d1d9;
-      }
+      .toolbar.dark,
       .toolbar.light {
-        background-color: #f6f8fa;
-        border-color: #d0d7de;
-        color: #24292f;
+        background-color: transparent;
+        border: none;
       }
       .btn {
         padding: 6px 16px;
@@ -61,30 +52,29 @@
         transform: translateY(-1px);
       }
       .btn-secondary {
-        background-color: transparent;
+        background-color: #21262d;
         border-color: #30363d;
         color: #c9d1d9;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
       }
       .toolbar.light .btn-secondary {
+        background-color: #ffffff;
         border-color: #d0d7de;
         color: #24292f;
       }
       .btn-secondary:hover {
-        background-color: rgba(110, 118, 129, 0.1);
+        background-color: #30363d;
         border-color: #8b949e;
       }
-      .toolbar-actions {
-        margin-left: auto;
-        display: flex;
-        gap: 12px;
+      .toolbar.light .btn-secondary:hover {
+        background-color: #f6f8fa;
       }
-      .toolbar-title {
-        font-size: 14px;
-        font-weight: 600;
-        color: inherit;
+      .toolbar-actions {
+        display: flex;
+        gap: 8px;
       }
       .container {
-        padding: 60px 20px 20px;
+        padding: 20px;
         min-height: 100%;
       }
       .loading {
@@ -282,12 +272,11 @@
           var toolbar = document.getElementById('toolbar');
           toolbar.className = 'toolbar ' + (currentIsDark ? 'dark' : 'light');
           toolbar.innerHTML =
-            '<div class="toolbar-title">Markdown 预览</div>' +
             '<div class="toolbar-actions">' +
-            '<button class="btn btn-secondary" onclick="downloadMd()">' +
+            '<button class="btn btn-secondary" title="下载 Markdown" onclick="downloadMd()">' +
             '<span>下载 MD</span>' +
             '</button>' +
-            '<button class="btn btn-primary" onclick="downloadHtml()">' +
+            '<button class="btn btn-primary" title="下载 HTML" onclick="downloadHtml()">' +
             '<span>下载 HTML</span>' +
             '</button>' +
             '</div>';
