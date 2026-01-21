@@ -17,65 +17,194 @@
         overflow: auto;
       }
       .toolbar {
+        display: none; /* 移除旧的工具栏 */
+      }
+      .floating-toolbar {
         position: fixed;
-        top: 16px;
-        right: 16px;
+        bottom: 32px;
+        left: 50%;
+        transform: translateX(-50%);
         display: flex;
         align-items: center;
-        gap: 8px;
-        z-index: 1000;
+        gap: 4px;
+        padding: 6px;
+        background-color: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(210, 215, 222, 0.5);
+        border-radius: 100px;
+        z-index: 2000;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
-      .toolbar.dark,
-      .toolbar.light {
-        background-color: transparent;
-        border: none;
+      .toolbar.dark .floating-toolbar {
+        background-color: rgba(22, 27, 34, 0.8);
+        border-color: rgba(48, 54, 61, 0.6);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      }
+      .floating-toolbar:hover {
+        transform: translateX(-50%) translateY(-2px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+        border-color: rgba(9, 105, 218, 0.3);
       }
       .btn {
-        padding: 6px 16px;
+        padding: 8px 16px;
         border: 1px solid transparent;
-        border-radius: 6px;
+        border-radius: 100px;
         cursor: pointer;
         font-size: 13px;
         font-weight: 500;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all 0.2s ease;
         display: flex;
         align-items: center;
         gap: 6px;
+        color: #57606a;
+        background: transparent;
+      }
+      .toolbar.dark .btn {
+        color: #8b949e;
+      }
+      .btn:hover {
+        background-color: rgba(9, 105, 218, 0.08);
+        color: #0969da;
+      }
+      .toolbar.dark .btn:hover {
+        background-color: rgba(88, 166, 255, 0.12);
+        color: #58a6ff;
       }
       .btn-primary {
         background-color: #238636;
-        color: white;
+        color: white !important;
       }
       .btn-primary:hover {
         background-color: #2ea043;
-        box-shadow: 0 4px 12px rgba(35, 134, 54, 0.3);
-        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(35, 134, 54, 0.2);
       }
-      .btn-secondary {
-        background-color: #21262d;
-        border-color: #30363d;
-        color: #c9d1d9;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-      }
-      .toolbar.light .btn-secondary {
-        background-color: #ffffff;
-        border-color: #d0d7de;
-        color: #24292f;
-      }
-      .btn-secondary:hover {
-        background-color: #30363d;
-        border-color: #8b949e;
-      }
-      .toolbar.light .btn-secondary:hover {
-        background-color: #f6f8fa;
-      }
-      .toolbar-actions {
-        display: flex;
-        gap: 8px;
-      }
+
       .container {
-        padding: 20px;
-        min-height: 100%;
+        display: flex;
+        min-height: 100vh;
+        padding: 40px 24px 100px 40px; /* 默认最小间距 */
+        gap: 0;
+        max-width: 1400px;
+        margin: 0 auto;
+        transition: padding-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        will-change: padding-left;
+      }
+      .container.with-toc {
+        padding-left: 300px;
+      }
+      .toc-sidebar {
+        width: 260px;
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        bottom: 20px;
+        display: flex;
+        flex-direction: column;
+        background-color: rgba(246, 248, 250, 0.6);
+        border-radius: 12px;
+        padding: 20px 5px 20px 20px;
+        border: 1px solid #d0d7de;
+        z-index: 100;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateX(-20px);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        pointer-events: none;
+        contain: strict; /* 性能隔离核心 */
+      }
+      .toolbar.dark .toc-sidebar {
+        background-color: rgba(13, 17, 23, 0.8);
+        border-color: #30363d;
+      }
+      .toc-sidebar.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(0);
+        pointer-events: auto;
+      }
+      .toc-content-wrapper {
+        flex: 1;
+        overflow-y: auto;
+        padding-right: 4px;
+      }
+      .toc-content-wrapper::-webkit-scrollbar {
+        width: 4px;
+      }
+      .toc-content-wrapper::-webkit-scrollbar-thumb {
+        background: #d0d7de;
+        border-radius: 10px;
+      }
+      .toolbar.dark .toc-content-wrapper::-webkit-scrollbar-thumb {
+        background: #30363d;
+      }
+      .toc-sidebar h3 {
+        margin: 0 0 16px 0;
+        font-size: 12px;
+        font-weight: 700;
+        color: #57606a;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      .toolbar.dark .toc-sidebar h3 {
+        color: #8b949e;
+      }
+      .toc-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .toc-list li {
+        margin: 2px 0;
+      }
+      .toc-list a {
+        display: block;
+        padding: 8px 12px;
+        color: #57606a;
+        text-decoration: none;
+        border-radius: 6px;
+        font-size: 13px;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .toolbar.dark .toc-list a {
+        color: #8b949e;
+      }
+      .toc-list a:hover {
+        background-color: rgba(9, 105, 218, 0.08);
+        color: #0969da;
+      }
+      .toolbar.dark .toc-list a:hover {
+        background-color: rgba(88, 166, 255, 0.1);
+        color: #58a6ff;
+      }
+      .toc-list .toc-h1 {
+        font-weight: 600;
+        padding-left: 0;
+      }
+      .toc-list .toc-h2 {
+        padding-left: 12px;
+      }
+      .toc-list .toc-h3 {
+        padding-left: 24px;
+      }
+      .toc-list .toc-h4 {
+        padding-left: 36px;
+      }
+
+      .content-area {
+        flex: 1;
+        min-width: 0;
+      }
+      .markdown-body {
+        contain: content;
+        text-rendering: optimizeSpeed;
+      }
+      .markdown-body table {
+        contain: paint;
       }
       .loading {
         display: flex;
@@ -89,12 +218,160 @@
   <body>
     <div id="toolbar" class="toolbar dark"></div>
     <div id="app" class="container">
-      <div class="loading">等待渲染内容...</div>
+      <div class="toc-sidebar" id="tocSidebar">
+        <h3>目录</h3>
+        <div class="toc-content-wrapper">
+          <ul class="toc-list" id="tocList"></ul>
+        </div>
+      </div>
+      <div class="content-area">
+        <div class="markdown-body">
+          <div class="loading">等待渲染内容...</div>
+        </div>
+      </div>
     </div>
+    <div class="floating-toolbar" id="floatingToolbar">
+      <button
+        id="toggleTocBtn"
+        class="btn"
+        title="切换目录"
+        onclick="toggleTocVisibility()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M2 4h12v2H2V4zm0 4h12v2H2V8zm0 4h12v2H2v-2z" />
+        </svg>
+        <span>隐藏目录</span>
+      </button>
+      <div
+        style="
+          width: 1px;
+          height: 16px;
+          background: rgba(210, 215, 222, 0.5);
+          margin: 0 4px;
+        "></div>
+      <button class="btn" title="下载 Markdown转换器" onclick="downloadMd()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M8 12l-4-4h2.5V3h3v5H12L8 12zM2 13h12v1H2v-1z" />
+        </svg>
+        <span>下载 MD</span>
+      </button>
+      <button
+        class="btn btn-primary"
+        title="下载 HTML"
+        onclick="downloadHtml()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M8 12l-4-4h2.5V3h3v5H12L8 12zM2 13h12v1H2v-1z" />
+        </svg>
+        <span>下载 HTML</span>
+      </button>
+    </div>
+    <div id="dynamicStyles"></div>
     <script>
       var currentMdText = '';
       var currentHtml = '';
       var currentIsDark = true;
+      var tocVisible = true; // 目录显示状态
+
+      // 保存目录显示状态到utools
+      var saveTocPreference = function (visible) {
+        if (typeof window.utools !== 'undefined') {
+          try {
+            window.utools.dbStorage.setItem('toc_visible', visible);
+          } catch (e) {
+            console.warn('无法保存目录设置:', e);
+          }
+        }
+      };
+
+      // 从utools加载目录显示状态
+      var loadTocPreference = function () {
+        if (typeof window.utools !== 'undefined') {
+          try {
+            var saved = window.utools.dbStorage.getItem('toc_visible');
+            return saved !== undefined ? saved : true;
+          } catch (e) {
+            console.warn('无法加载目录设置:', e);
+            return true;
+          }
+        }
+        return true;
+      };
+
+      // 切换目录显示状态
+      var toggleTocVisibility = function () {
+        tocVisible = !tocVisible;
+        var tocSidebar = document.getElementById('tocSidebar');
+        var app = document.getElementById('app');
+        var toggleBtn = document.getElementById('toggleTocBtn');
+
+        if (tocVisible) {
+          tocSidebar.classList.add('visible');
+          app.classList.add('with-toc');
+          if (toggleBtn)
+            toggleBtn.querySelector('span').textContent = '隐藏目录';
+        } else {
+          tocSidebar.classList.remove('visible');
+          app.classList.remove('with-toc');
+          if (toggleBtn)
+            toggleBtn.querySelector('span').textContent = '显示目录';
+        }
+        saveTocPreference(tocVisible);
+      };
+
+      var generateTableOfContents = function () {
+        var contentArea = document.querySelector('.markdown-body');
+        var headers = contentArea.querySelectorAll('h1, h2, h3, h4, h5, h6');
+        var tocList = document.getElementById('tocList');
+        var tocSidebar = document.getElementById('tocSidebar');
+        var app = document.getElementById('app');
+
+        if (headers.length === 0) {
+          tocSidebar.classList.remove('visible');
+          app.classList.remove('with-toc');
+          return;
+        }
+
+        if (tocVisible) {
+          tocSidebar.classList.add('visible');
+          app.classList.add('with-toc');
+        }
+
+        var fragment = document.createDocumentFragment();
+        headers.forEach(function (header) {
+          if (!header.id) {
+            header.id = header.textContent
+              .toLowerCase()
+              .replace(/[^\w\u4e00-\u9fa5]+/g, '-')
+              .replace(/^-+|-+$/g, '');
+          }
+
+          var listItem = document.createElement('li');
+          var link = document.createElement('a');
+          link.href = '#' + header.id;
+          link.textContent = header.textContent;
+          link.className = 'toc-' + header.tagName.toLowerCase();
+
+          link.addEventListener('click', function (e) {
+            e.preventDefault();
+            var target = document.getElementById(header.id);
+            if (target) {
+              target.scrollIntoView({ behavior: 'smooth' });
+              var links = tocList.querySelectorAll('a');
+              for (var i = 0; i < links.length; i++) {
+                links[i].style.fontWeight = 'normal';
+                links[i].style.color = currentIsDark ? '#8b949e' : '#57606a';
+              }
+              link.style.fontWeight = '600';
+              link.style.color = currentIsDark ? '#58a6ff' : '#0969da';
+            }
+          });
+
+          listItem.appendChild(link);
+          fragment.appendChild(listItem);
+        });
+
+        tocList.innerHTML = '';
+        tocList.appendChild(fragment);
+      };
 
       var getStyles = function (isDark) {
         return (
@@ -102,7 +379,7 @@
           (isDark ? '#0d1117' : '#ffffff') +
           ';color:' +
           (isDark ? '#c9d1d9' : '#24292f') +
-          ';font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;margin:0;padding:20px}.markdown-body{max-width:900px;margin:0 auto}.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4,.markdown-body h5,.markdown-body h6{margin-top:24px;margin-bottom:16px;font-weight:600;line-height:1.25}.markdown-body h1{font-size:2em;border-bottom:1px solid ' +
+          ';font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;margin:0;padding:20px}.markdown-body{max-width:1000px;margin:0}.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4,.markdown-body h5,.markdown-body h6{margin-top:24px;margin-bottom:16px;font-weight:600;line-height:1.25}.markdown-body h1{font-size:2em;border-bottom:1px solid ' +
           (isDark ? '#30363d' : '#d0d7de') +
           ';padding-bottom:.3em}.markdown-body h2{font-size:1.5em;border-bottom:1px solid ' +
           (isDark ? '#30363d' : '#d0d7de') +
@@ -215,49 +492,35 @@
       };
 
       var renderMermaid = function () {
-        var pres = document.querySelectorAll('pre');
-        for (var i = 0; i < pres.length; i++) {
-          var pre = pres[i];
-          var code = pre.querySelector('code');
-          if (code) {
-            var text = (code.textContent || '').trim();
-            if (isMermaidCode(text)) {
-              var d = document.createElement('div');
-              d.className = 'mermaid';
-              d.textContent = text;
-              pre.parentNode.replaceChild(d, pre);
-            }
+        var codes = document.querySelectorAll('pre > code');
+        var needsRender = false;
+
+        for (var i = 0; i < codes.length; i++) {
+          var code = codes[i];
+          var text = (code.textContent || '').trim();
+          if (isMermaidCode(text)) {
+            var div = document.createElement('div');
+            div.className = 'mermaid';
+            div.textContent = text;
+            var pre = code.parentNode;
+            pre.parentNode.replaceChild(div, pre);
+            needsRender = true;
           }
         }
 
-        var codes = document.querySelectorAll(
-          'code[class*="language-mermaid"], code[class*="mermaid"]',
-        );
-        for (var j = 0; j < codes.length; j++) {
-          var c = codes[j];
-          var ct = (c.textContent || '').trim();
-          if (isMermaidCode(ct)) {
-            var dm = document.createElement('div');
-            dm.className = 'mermaid';
-            dm.textContent = ct;
-            c.parentNode.replaceChild(dm, c);
-          }
-        }
-
-        var mermaids = document.querySelectorAll('.mermaid');
-        if (mermaids.length > 0) {
+        if (needsRender) {
           var s = document.createElement('script');
           s.src = 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js';
           s.onload = function () {
             try {
-              mermaid.initialize({ theme: currentIsDark ? 'dark' : 'default' });
+              mermaid.initialize({
+                theme: currentIsDark ? 'dark' : 'default',
+                startOnLoad: false,
+              });
               mermaid.run();
             } catch (e) {
               console.error('mermaid error:', e);
             }
-          };
-          s.onerror = function (e) {
-            console.error('mermaid script load error:', e);
           };
           document.body.appendChild(s);
         }
@@ -269,27 +532,44 @@
           currentIsDark = data.isDark !== false;
           if (data.mdText) currentMdText = data.mdText;
 
+          tocVisible = loadTocPreference();
+
+          // 1. 设置暗色/亮色类名
           var toolbar = document.getElementById('toolbar');
           toolbar.className = 'toolbar ' + (currentIsDark ? 'dark' : 'light');
-          toolbar.innerHTML =
-            '<div class="toolbar-actions">' +
-            '<button class="btn btn-secondary" title="下载 Markdown" onclick="downloadMd()">' +
-            '<span>下载 MD</span>' +
-            '</button>' +
-            '<button class="btn btn-primary" title="下载 HTML" onclick="downloadHtml()">' +
-            '<span>下载 HTML</span>' +
-            '</button>' +
-            '</div>';
 
+          // 2. 更新样式（不重载整个 DOM）
+          document.getElementById('dynamicStyles').innerHTML =
+            '<style>' + getStyles(currentIsDark) + '</style>';
+
+          // 3. 仅更新正文内容
           var app = document.getElementById('app');
-          app.innerHTML =
-            '<style>' +
-            getStyles(currentIsDark) +
-            '</style><div class="markdown-body">' +
-            currentHtml +
-            '</div>';
+          var markdownBody = app.querySelector('.markdown-body');
+          markdownBody.innerHTML = currentHtml;
 
-          setTimeout(renderMermaid, 200);
+          // 4. 更新 UI 状态
+          var floatingToolbar = document.getElementById('floatingToolbar');
+          floatingToolbar.style.display = 'flex';
+          var toggleBtn = document.getElementById('toggleTocBtn');
+          if (toggleBtn)
+            toggleBtn.querySelector('span').textContent = tocVisible
+              ? '隐藏目录'
+              : '显示目录';
+
+          var tocSidebar = document.getElementById('tocSidebar');
+          if (tocVisible) {
+            tocSidebar.classList.add('visible');
+            app.classList.add('with-toc');
+          } else {
+            tocSidebar.classList.remove('visible');
+            app.classList.remove('with-toc');
+          }
+
+          // 5. 异步处理重任务
+          setTimeout(function () {
+            renderMermaid();
+            setTimeout(generateTableOfContents, 50);
+          }, 100);
         } catch (e) {
           console.error('renderContent error:', e);
         }

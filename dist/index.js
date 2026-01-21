@@ -30926,23 +30926,34 @@ var lexer = _Lexer.lex;
 
 let currentMdText = '';
 let currentHtml = '';
-function createPreviewWindow(html, isDark, mdText) {
+let previewWin = null;
+function createPreviewWindow(html2, isDark, mdText, forceNew = false) {
   const data = {
-    html,
+    html: html2,
     isDark,
     mdText
   };
-  const previewWindow = window.utools.createBrowserWindow('preview.html', {
-    width: 900,
-    height: 700,
+  if (!forceNew && previewWin) {
+    try {
+      previewWin.webContents.executeJavaScript(`window.renderContent(${JSON.stringify(data)})`);
+      previewWin.show();
+      previewWin.focus();
+      return;
+    } catch (e) {
+      previewWin = null;
+    }
+  }
+  previewWin = window.utools.createBrowserWindow('preview.html', {
+    width: 1100,
+    height: 800,
     title: 'Markdown 预览',
     resizable: true,
     webPreferences: {
       preload: 'preview_preload.js'
     }
   }, () => {
-    previewWindow.webContents.executeJavaScript(`window.renderContent(${JSON.stringify(data)})`);
-    previewWindow.show();
+    previewWin.webContents.executeJavaScript(`window.renderContent(${JSON.stringify(data)})`);
+    previewWin.show();
   });
 }
 function App() {
@@ -30979,7 +30990,104 @@ function App() {
       alignItems: 'center',
       color: '#666'
     },
-    children: loading ? '正在渲染...' : error ? error : '预览窗口已打开'
+    children: loading ? '正在渲染...' : error ? error : (0,jsx_runtime.jsxs)("div", {
+      style: {
+        textAlign: 'center'
+      },
+      children: [(0,jsx_runtime.jsx)("style", {
+        children: `
+          .panel-btn:hover {
+            background: #f6f8fa !important;
+            border-color: #8b949e !important;
+            color: #0969da !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          }
+          .panel-btn:active {
+            transform: translateY(0);
+            box-shadow: none;
+          }
+        `
+      }), (0,jsx_runtime.jsx)("div", {
+        style: {
+          marginBottom: '20px',
+          fontSize: '16px'
+        },
+        children: "预览窗口已打开"
+      }), (0,jsx_runtime.jsxs)("div", {
+        style: {
+          display: 'flex',
+          gap: '12px'
+        },
+        children: [(0,jsx_runtime.jsx)("button", {
+          className: "panel-btn",
+          onClick: () => {
+            if (previewWin) {
+              previewWin.show();
+              previewWin.focus();
+            }
+          },
+          style: {
+            padding: '8px 20px',
+            borderRadius: '100px',
+            border: '1px solid #d0d7de',
+            background: 'transparent',
+            color: '#57606a',
+            cursor: 'pointer',
+            fontSize: '13px',
+            fontWeight: '500',
+            transition: 'all 0.2s'
+          },
+          children: "显示原预览窗口"
+        }), (0,jsx_runtime.jsx)("button", {
+          className: "panel-btn",
+          onClick: async () => {
+            try {
+              const text = await window.services.readClipboardText();
+              if (text && text.trim()) {
+                const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                createPreviewWindow(marked.parse(text), isDark, text, false);
+              }
+            } catch (e) {}
+          },
+          style: {
+            padding: '8px 20px',
+            borderRadius: '100px',
+            border: '1px solid #d0d7de',
+            background: 'transparent',
+            color: '#57606a',
+            cursor: 'pointer',
+            fontSize: '13px',
+            fontWeight: '500',
+            transition: 'all 0.2s'
+          },
+          children: "从剪贴板更新预览内容"
+        }), (0,jsx_runtime.jsx)("button", {
+          className: "panel-btn",
+          onClick: async () => {
+            try {
+              const text = await window.services.readClipboardText();
+              if (text && text.trim()) {
+                const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                createPreviewWindow(marked.parse(text), isDark, text, true);
+              }
+            } catch (e) {}
+          },
+          style: {
+            padding: '8px 20px',
+            borderRadius: '100px',
+            border: '1px solid #d0d7de',
+            background: 'transparent',
+            color: '#57606a',
+            cursor: 'pointer',
+            fontSize: '13px',
+            fontWeight: '500',
+            transition: 'all 0.2s'
+          },
+          children: "打开新预览窗口"
+        })]
+      })]
+    })
   });
 }
 ;// ./src/index.js
