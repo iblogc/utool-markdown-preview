@@ -109,6 +109,16 @@
         background-color: rgba(255, 255, 255, 0.1);
       }
 
+      /* 按钮激活状态 */
+      .btn.active {
+        background-color: rgba(9, 105, 218, 0.1) !important;
+        color: #0969da !important;
+      }
+      .toolbar.dark .btn.active {
+        background-color: rgba(88, 166, 255, 0.15) !important;
+        color: #58a6ff !important;
+      }
+
       /* 移除旧的特定类名样式 */
       .btn-primary {
         background: transparent !important;
@@ -364,22 +374,28 @@
         return true;
       };
 
-      // 切换目录显示状态
-      var toggleTocVisibility = function () {
-        tocVisible = !tocVisible;
+      // 更新目录 UI
+      var updateTocUI = function () {
         var tocSidebar = document.getElementById('tocSidebar');
         var app = document.getElementById('app');
         var toggleBtn = document.getElementById('toggleTocBtn');
+        if (!tocSidebar || !app) return;
 
         if (tocVisible) {
           tocSidebar.classList.add('visible');
           app.classList.add('with-toc');
-          if (toggleBtn) toggleBtn.querySelector('span').textContent = '目录';
+          if (toggleBtn) toggleBtn.classList.add('active');
         } else {
           tocSidebar.classList.remove('visible');
           app.classList.remove('with-toc');
-          if (toggleBtn) toggleBtn.querySelector('span').textContent = '目录';
+          if (toggleBtn) toggleBtn.classList.remove('active');
         }
+      };
+
+      // 切换目录显示状态
+      var toggleTocVisibility = function () {
+        tocVisible = !tocVisible;
+        updateTocUI();
         saveTocPreference(tocVisible);
       };
 
@@ -689,22 +705,10 @@
           // 4. 更新 UI 状态
           var floatingToolbar = document.getElementById('floatingToolbar');
           floatingToolbar.style.display = 'flex';
-          var toggleBtn = document.getElementById('toggleTocBtn');
-          if (toggleBtn)
-            toggleBtn.querySelector('span').textContent = tocVisible
-              ? '目录'
-              : '目录';
-
-          var tocSidebar = document.getElementById('tocSidebar');
-          if (tocVisible) {
-            tocSidebar.classList.add('visible');
-            app.classList.add('with-toc');
-          } else {
-            tocSidebar.classList.remove('visible');
-            app.classList.remove('with-toc');
-          }
+          updateTocUI();
 
           // 5. 异步处理重任务
+
           setTimeout(function () {
             renderMermaid();
             setTimeout(generateTableOfContents, 50);

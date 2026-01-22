@@ -35,3 +35,7 @@ ipcRenderer.on('theme-change', (event, isDark) => {
     document.body.style.color = isDark ? '#c9d1d9' : '#24292f'
   }
 })
+
+// 暴露 utools API 给 window，以便 preview.html 使用 dbStorage
+window.utools = utools
+
