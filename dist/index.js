@@ -30959,6 +30959,22 @@ function createPreviewWindow(html2, isDark, mdText, forceNew = false) {
 function App() {
   const [loading, setLoading] = (0,react.useState)(true);
   const [error, setError] = (0,react.useState)(null);
+  const [hasPreviewWin, setHasPreviewWin] = (0,react.useState)(false);
+  const [hasClipboardText, setHasClipboardText] = (0,react.useState)(false);
+
+  const checkStatus = async () => {
+    // 检查预览窗口是否还在且未被销毁
+    setHasPreviewWin(!!(previewWin && !previewWin.isDestroyed()));
+    
+    // 检查剪贴板内容
+    try {
+      const text = await window.services.readClipboardText();
+      setHasClipboardText(!!(text && text.trim()));
+    } catch (e) {
+      setHasClipboardText(false);
+    }
+  };
+
   (0,react.useEffect)(() => {
     window.utools.onPluginEnter(async () => {
       setLoading(true);
@@ -30978,9 +30994,25 @@ function App() {
         setError(e.message);
       } finally {
         setLoading(false);
+        checkStatus();
       }
     });
+
+    // 定时检查和焦点检查
+    checkStatus();
+    window.onfocus = () => {
+      checkStatus();
+    };
+    const timer = setInterval(() => {
+      checkStatus();
+    }, 2000);
+
+    return () => {
+      window.onfocus = null;
+      clearInterval(timer);
+    };
   }, []);
+
   return /*#__PURE__*/(0,jsx_runtime.jsx)("div", {
     style: {
       width: '100%',
@@ -30996,16 +31028,23 @@ function App() {
       },
       children: [(0,jsx_runtime.jsx)("style", {
         children: `
-          .panel-btn:hover {
+          .panel-btn:hover:not(.disabled) {
             background: #f6f8fa !important;
             border-color: #8b949e !important;
             color: #0969da !important;
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
           }
-          .panel-btn:active {
+          .panel-btn:active:not(.disabled) {
             transform: translateY(0);
             box-shadow: none;
+          }
+          .panel-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed !important;
+            background: #f5f5f5 !important;
+            color: #999 !important;
+            border-color: #e1e4e8 !important;
           }
         `
       }), (0,jsx_runtime.jsx)("div", {
@@ -31020,9 +31059,9 @@ function App() {
           gap: '12px'
         },
         children: [(0,jsx_runtime.jsx)("button", {
-          className: "panel-btn",
+          className: `panel-btn ${!hasPreviewWin ? 'disabled' : ''}`,
           onClick: () => {
-            if (previewWin) {
+            if (previewWin && !previewWin.isDestroyed()) {
               previewWin.show();
               previewWin.focus();
             }
@@ -31033,20 +31072,23 @@ function App() {
             border: '1px solid #d0d7de',
             background: 'transparent',
             color: '#57606a',
-            cursor: 'pointer',
+            cursor: 'not-allowed', // 默认，会被下面的 transition 覆盖
             fontSize: '13px',
             fontWeight: '500',
-            transition: 'all 0.2s'
+            transition: 'all 0.2s',
+            cursor: hasPreviewWin ? 'pointer' : 'not-allowed'
           },
           children: "显示原预览窗口"
         }), (0,jsx_runtime.jsx)("button", {
-          className: "panel-btn",
+          className: `panel-btn ${!hasClipboardText ? 'disabled' : ''}`,
           onClick: async () => {
+            if (!hasClipboardText) return;
             try {
               const text = await window.services.readClipboardText();
               if (text && text.trim()) {
                 const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
                 createPreviewWindow(marked.parse(text), isDark, text, false);
+                checkStatus();
               }
             } catch (e) {}
           },
@@ -31056,20 +31098,22 @@ function App() {
             border: '1px solid #d0d7de',
             background: 'transparent',
             color: '#57606a',
-            cursor: 'pointer',
             fontSize: '13px',
             fontWeight: '500',
-            transition: 'all 0.2s'
+            transition: 'all 0.2s',
+            cursor: hasClipboardText ? 'pointer' : 'not-allowed'
           },
           children: "从剪贴板更新预览内容"
         }), (0,jsx_runtime.jsx)("button", {
-          className: "panel-btn",
+          className: `panel-btn ${!hasClipboardText ? 'disabled' : ''}`,
           onClick: async () => {
+            if (!hasClipboardText) return;
             try {
               const text = await window.services.readClipboardText();
               if (text && text.trim()) {
                 const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
                 createPreviewWindow(marked.parse(text), isDark, text, true);
+                checkStatus();
               }
             } catch (e) {}
           },
@@ -31079,10 +31123,10 @@ function App() {
             border: '1px solid #d0d7de',
             background: 'transparent',
             color: '#57606a',
-            cursor: 'pointer',
             fontSize: '13px',
             fontWeight: '500',
-            transition: 'all 0.2s'
+            transition: 'all 0.2s',
+            cursor: hasClipboardText ? 'pointer' : 'not-allowed'
           },
           children: "打开新预览窗口"
         })]

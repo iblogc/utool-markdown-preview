@@ -18,6 +18,16 @@ window.saveFile = (fileName, content) => {
   }
 }
 
+window.copyText = (text) => {
+  utools.copyText(text)
+  utools.showNotification('已复制到剪贴板')
+}
+
+window.copyImage = (dataUrl) => {
+  utools.copyImage(dataUrl)
+  utools.showNotification('图片已复制到剪贴板')
+}
+
 // 监听主题变化
 ipcRenderer.on('theme-change', (event, isDark) => {
   if (document.body) {

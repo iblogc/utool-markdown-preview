@@ -58,27 +58,67 @@
         display: flex;
         align-items: center;
         gap: 6px;
-        color: #57606a;
         background: transparent;
+      }
+
+      /* 基础文字颜色 - 默认灰色 */
+      .btn {
+        color: #57606a;
       }
       .toolbar.dark .btn {
         color: #8b949e;
       }
-      .btn:hover {
-        background-color: rgba(9, 105, 218, 0.08);
+
+      /* 1. 目录色系 - 保持中性深灰 */
+      .btn-toc {
+        color: #57606a;
+      }
+      .toolbar.dark .btn-toc {
+        color: #8b949e;
+      }
+
+      /* 2. MD 色系 - 稳重蓝 */
+      .btn-md {
         color: #0969da;
       }
-      .toolbar.dark .btn:hover {
-        background-color: rgba(88, 166, 255, 0.12);
+      .toolbar.dark .btn-md {
         color: #58a6ff;
       }
+
+      /* 3. 图 色系 - 稳重绿 (替代之前的实色) */
+      .btn-img {
+        color: #1a7f37;
+      }
+      .toolbar.dark .btn-img {
+        color: #3fb950;
+      }
+
+      /* 4. HTML 色系 - 稳重紫 */
+      .btn-html {
+        color: #8250df;
+      }
+      .toolbar.dark .btn-html {
+        color: #a371f7;
+      }
+
+      .btn:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+        transform: translateY(-1px);
+      }
+      .toolbar.dark .btn:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+
+      /* 移除旧的特定类名样式 */
       .btn-primary {
-        background-color: #238636;
-        color: white !important;
+        background: transparent !important;
       }
       .btn-primary:hover {
-        background-color: #2ea043;
-        box-shadow: 0 4px 12px rgba(35, 134, 54, 0.2);
+        box-shadow: none;
+      }
+
+      .btn:active {
+        transform: translateY(0);
       }
 
       .container {
@@ -233,13 +273,13 @@
     <div class="floating-toolbar" id="floatingToolbar">
       <button
         id="toggleTocBtn"
-        class="btn"
+        class="btn btn-toc"
         title="切换目录"
         onclick="toggleTocVisibility()">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-          <path d="M2 4h12v2H2V4zm0 4h12v2H2V8zm0 4h12v2H2v-2z" />
+          <path d="M2 4h12v2H2V4zm0 4h12v2H2V4zm0 4h12v2H2V8zm0 4h12v2H2v-2z" />
         </svg>
-        <span>隐藏目录</span>
+        <span>目录</span>
       </button>
       <div
         style="
@@ -248,23 +288,51 @@
           background: rgba(210, 215, 222, 0.5);
           margin: 0 4px;
         "></div>
-      <button class="btn" title="下载 Markdown转换器" onclick="downloadMd()">
+      <button class="btn btn-md" title="下载 Markdown" onclick="downloadMd()">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
           <path d="M8 12l-4-4h2.5V3h3v5H12L8 12zM2 13h12v1H2v-1z" />
         </svg>
-        <span>下载 MD</span>
+        <span>MD</span>
       </button>
       <button
-        class="btn btn-primary"
-        title="下载 HTML"
-        onclick="downloadHtml()">
+        class="btn btn-md"
+        title="复制 Markdown 源码"
+        onclick="copyMarkdown()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path
+            d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z" />
+          <path
+            d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z" />
+        </svg>
+        <span>MD</span>
+      </button>
+      <button class="btn btn-img" title="下载预览图" onclick="downloadImage()">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
           <path d="M8 12l-4-4h2.5V3h3v5H12L8 12zM2 13h12v1H2v-1z" />
         </svg>
-        <span>下载 HTML</span>
+        <span>图</span>
+      </button>
+      <button
+        class="btn btn-img"
+        title="复制预览图"
+        onclick="copyImageToClipboard()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path
+            d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z" />
+          <path
+            d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z" />
+        </svg>
+        <span>图</span>
+      </button>
+      <button class="btn btn-html" title="下载 HTML" onclick="downloadHtml()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M8 12l-4-4h2.5V3h3v5H12L8 12zM2 13h12v1H2v-1z" />
+        </svg>
+        <span>HTML</span>
       </button>
     </div>
     <div id="dynamicStyles"></div>
+    <script src="html2canvas.min.js"></script>
     <script>
       var currentMdText = '';
       var currentHtml = '';
@@ -306,13 +374,11 @@
         if (tocVisible) {
           tocSidebar.classList.add('visible');
           app.classList.add('with-toc');
-          if (toggleBtn)
-            toggleBtn.querySelector('span').textContent = '隐藏目录';
+          if (toggleBtn) toggleBtn.querySelector('span').textContent = '目录';
         } else {
           tocSidebar.classList.remove('visible');
           app.classList.remove('with-toc');
-          if (toggleBtn)
-            toggleBtn.querySelector('span').textContent = '显示目录';
+          if (toggleBtn) toggleBtn.querySelector('span').textContent = '目录';
         }
         saveTocPreference(tocVisible);
       };
@@ -413,6 +479,11 @@
         window.saveFile(fileName, currentMdText);
       };
 
+      var copyMarkdown = function () {
+        if (!currentMdText || typeof window.copyText !== 'function') return;
+        window.copyText(currentMdText);
+      };
+
       var generateFullHtml = function (html, isDark) {
         return (
           '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>Markdown 预览</title><style>' +
@@ -429,6 +500,74 @@
         var fullHtml = generateFullHtml(processedHtml, currentIsDark);
         var fileName = 'markdown_' + Date.now() + '.html';
         window.saveFile(fileName, fullHtml);
+      };
+
+      var downloadImage = async function () {
+        const markdownBody = document.querySelector('.markdown-body');
+        if (!markdownBody) return;
+
+        // 记录原始样式
+        const originalPadding = markdownBody.style.padding;
+        const originalBoxSizing = markdownBody.style.boxSizing;
+
+        // 临时增加边距
+        markdownBody.style.padding = '40px';
+        markdownBody.style.boxSizing = 'border-box';
+
+        try {
+          const canvas = await html2canvas(markdownBody, {
+            backgroundColor: currentIsDark ? '#0d1117' : '#ffffff',
+            scale: 2, // 提高清晰度
+            useCORS: true,
+            logging: false,
+          });
+          const dataUrl = canvas.toDataURL('image/png');
+          // 将 dataUrl 转换为 Blob 并保存
+          const base64Data = dataUrl.replace(/^data:image\/png;base64,/, '');
+          const buffer = Uint8Array.from(atob(base64Data), (c) =>
+            c.charCodeAt(0),
+          );
+          const fileName = 'markdown_' + Date.now() + '.png';
+          window.saveFile(fileName, buffer);
+        } catch (e) {
+          console.error('生成图片失败:', e);
+        } finally {
+          // 恢复原始样式
+          markdownBody.style.padding = originalPadding;
+          markdownBody.style.boxSizing = originalBoxSizing;
+        }
+      };
+
+      var copyImageToClipboard = async function () {
+        const markdownBody = document.querySelector('.markdown-body');
+        if (!markdownBody) return;
+
+        // 记录原始样式
+        const originalPadding = markdownBody.style.padding;
+        const originalBoxSizing = markdownBody.style.boxSizing;
+
+        // 临时增加边距
+        markdownBody.style.padding = '40px';
+        markdownBody.style.boxSizing = 'border-box';
+
+        try {
+          const canvas = await html2canvas(markdownBody, {
+            backgroundColor: currentIsDark ? '#0d1117' : '#ffffff',
+            scale: 2,
+            useCORS: true,
+            logging: false,
+          });
+          const dataUrl = canvas.toDataURL('image/png');
+          if (typeof window.copyImage === 'function') {
+            window.copyImage(dataUrl);
+          }
+        } catch (e) {
+          console.error('复制图片失败:', e);
+        } finally {
+          // 恢复原始样式
+          markdownBody.style.padding = originalPadding;
+          markdownBody.style.boxSizing = originalBoxSizing;
+        }
       };
 
       var renderMermaidForDownload = async function (html) {
@@ -553,8 +692,8 @@
           var toggleBtn = document.getElementById('toggleTocBtn');
           if (toggleBtn)
             toggleBtn.querySelector('span').textContent = tocVisible
-              ? '隐藏目录'
-              : '显示目录';
+              ? '目录'
+              : '目录';
 
           var tocSidebar = document.getElementById('tocSidebar');
           if (tocVisible) {
