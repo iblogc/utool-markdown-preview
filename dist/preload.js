@@ -42,9 +42,13 @@ const {
 const {
   clipboard
 } = __webpack_require__(482);
+const fs = require('fs');
 window.services = {
   readClipboardText: () => {
     return clipboard.readText();
+  },
+  readFileText: (path) => {
+    return fs.readFileSync(path, 'utf-8');
   }
 };
 /******/ })()

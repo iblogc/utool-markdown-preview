@@ -24,6 +24,21 @@
         }
       ],
       "mainHide": true
+    },
+    {
+      "code": "mdPreviewFile",
+      "explain": "Markdown 文件预览",
+      "cmds": [
+        {
+          "type": "files",
+          "label": "Markdown 预览",
+          "fileType": "file",
+          "extensions": ["md"],
+          "minLength": 1,
+          "maxLength": 1
+        }
+      ],
+      "mainHide": true
     }
   ],
   "aiTaskId": "b1ba3ac5-b1f9-4a5b-84be-1ab64b27bf19"

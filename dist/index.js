@@ -30976,19 +30976,25 @@ function App() {
   };
 
   (0,react.useEffect)(() => {
-    window.utools.onPluginEnter(async () => {
+    window.utools.onPluginEnter(async ({ code, type, payload }) => {
       setLoading(true);
       setError(null);
       try {
-        const text = await window.services.readClipboardText();
+        let text = "";
+        if (type === "files" && payload && payload.length > 0) {
+          text = window.services.readFileText(payload[0].path);
+        } else {
+          text = await window.services.readClipboardText();
+        }
+
         if (text && text.trim()) {
           currentMdText = text;
           const rendered = marked.parse(text);
           currentHtml = rendered;
-          const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
           createPreviewWindow(rendered, isDark, text);
         } else {
-          setError('剪贴板中没有 Markdown 内容');
+          setError(type === "files" ? "读取文件内容失败或文件为空" : "剪贴板中没有 Markdown 内容");
         }
       } catch (e) {
         setError(e.message);
