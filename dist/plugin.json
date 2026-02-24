@@ -5,20 +5,22 @@
   "features": [
     {
       "code": "mdPreview1",
-      "explain": "Markdown 预览",
+      "explain": "Markdown/HTML/SVG 预览",
       "cmds": [
         "md预览",
-        "markdown预览"
+        "markdown预览",
+        "html预览",
+        "svg预览"
       ],
       "mainHide": true
     },
     {
       "code": "mdPreview2",
-      "explain": "Markdown 预览",
+      "explain": "Markdown/HTML/SVG 预览",
       "cmds": [
         {
           "type": "over",
-          "label": "Markdown 预览",
+          "label": "Markdown/HTML/SVG 预览",
           "minLength": 1,
           "maxLength": 999999
         }
@@ -27,13 +29,13 @@
     },
     {
       "code": "mdPreviewFile",
-      "explain": "Markdown 文件预览",
+      "explain": "Markdown/HTML/SVG 预览",
       "cmds": [
         {
           "type": "files",
-          "label": "Markdown 预览",
+          "label": "Markdown/HTML/SVG 预览",
           "fileType": "file",
-          "extensions": ["md"],
+          "extensions": ["md", "html", "svg"],
           "minLength": 1,
           "maxLength": 1
         }

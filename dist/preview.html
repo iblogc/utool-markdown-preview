@@ -256,7 +256,87 @@
       .markdown-body table {
         contain: paint;
       }
-      .loading {
+
+      /* 自定义消息提示样式 */
+      .toast-container {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        pointer-events: none;
+      }
+      .toast {
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        color: #ffffff !important;
+        background-color: rgba(47, 54, 61, 0.95);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        min-width: 180px;
+        justify-content: center;
+      }
+      .toast,
+      .toast * {
+        color: #ffffff !important;
+      }
+      .toast svg:not(.toast-spinner) {
+        fill: #ffffff !important;
+      }
+      .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .toast.success {
+        background-color: rgba(31, 136, 61, 0.95);
+        border-color: rgba(255, 255, 255, 0.2);
+      }
+      .toast.error {
+        background-color: rgba(207, 34, 46, 0.95);
+        border-color: rgba(255, 255, 255, 0.2);
+      }
+      .toast.loading {
+        background-color: rgba(9, 105, 218, 0.95);
+        border-color: rgba(255, 255, 255, 0.2);
+        min-height: auto;
+        height: auto;
+      }
+      .toast.loading .toast-spinner {
+        animation: toast-spin 1s linear infinite;
+      }
+      @keyframes toast-spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .toast-icon {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+      }
+      .toast-icon:not(.toast-spinner) {
+        fill: #ffffff !important;
+      }
+      .toast-spinner {
+        color: #ffffff;
+      }
+      .markdown-body > .loading {
         display: flex;
         justify-content: center;
         align-items: center;
@@ -342,12 +422,141 @@
       </button>
     </div>
     <div id="dynamicStyles"></div>
+    <div class="toast-container" id="toastContainer"></div>
     <script src="html2canvas.min.js"></script>
     <script>
       var currentMdText = '';
       var currentHtml = '';
       var currentIsDark = true;
       var tocVisible = true; // 目录显示状态
+
+      // 自定义消息提示函数
+      var showToast = function (message, type, duration) {
+        type = type || 'success';
+        duration = duration || 3000;
+        var container = document.getElementById('toastContainer');
+        if (!container) return null;
+
+        var toast = document.createElement('div');
+        toast.className = 'toast ' + type;
+
+        // 根据类型选择图标
+        var iconSvg = '';
+        if (type === 'success') {
+          iconSvg =
+            '<svg class="toast-icon" viewBox="0 0 16 16" fill="currentColor">' +
+            '<path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0z"/>' +
+            '</svg>';
+        } else if (type === 'error') {
+          iconSvg =
+            '<svg class="toast-icon" viewBox="0 0 16 16" fill="currentColor">' +
+            '<path d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06z"/>' +
+            '</svg>';
+        } else if (type === 'loading') {
+          iconSvg =
+            '<svg class="toast-icon toast-spinner" viewBox="0 0 50 50">' +
+            '<circle cx="25" cy="25" r="20" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-dasharray="90 150" stroke-dashoffset="0">' +
+            '<animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="0.9s" repeatCount="indefinite"/>' +
+            '</circle>' +
+            '</svg>';
+        } else {
+          iconSvg =
+            '<svg class="toast-icon" viewBox="0 0 16 16" fill="currentColor">' +
+            '<path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm.75-11.25a.75.75 0 0 0-1.5 0v5.5a.75.75 0 0 0 1.5 0v-5.5Zm0 7a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z"/>' +
+            '</svg>';
+        }
+
+        toast.innerHTML = iconSvg + '<span>' + message + '</span>';
+        container.appendChild(toast);
+
+        // 触发动画
+        requestAnimationFrame(function () {
+          toast.classList.add('show');
+        });
+
+        // 保存定时器引用
+        var autoCloseTimer = null;
+        var removeTimer = null;
+
+        // 如果 duration > 0，则自动移除
+        if (duration > 0) {
+          autoCloseTimer = setTimeout(function () {
+            toast.classList.remove('show');
+            removeTimer = setTimeout(function () {
+              if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+              }
+            }, 300);
+          }, duration);
+        }
+
+        // 返回控制对象，支持手动关闭和更新消息
+        return {
+          close: function () {
+            if (autoCloseTimer) {
+              clearTimeout(autoCloseTimer);
+              autoCloseTimer = null;
+            }
+            if (removeTimer) {
+              clearTimeout(removeTimer);
+              removeTimer = null;
+            }
+            toast.classList.remove('show');
+            setTimeout(function () {
+              if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+              }
+            }, 300);
+          },
+          update: function (newMessage, newType, newDuration) {
+            // 清除之前的定时器
+            if (autoCloseTimer) {
+              clearTimeout(autoCloseTimer);
+              autoCloseTimer = null;
+            }
+            if (removeTimer) {
+              clearTimeout(removeTimer);
+              removeTimer = null;
+            }
+
+            toast.querySelector('span').textContent = newMessage;
+            if (newType) {
+              // 使用 classList 更新类型类，保留 show 类
+              toast.classList.remove('loading', 'success', 'error');
+              toast.classList.add(newType);
+              // 更新图标
+              var newIconSvg = '';
+              if (newType === 'success') {
+                newIconSvg =
+                  '<svg class="toast-icon" viewBox="0 0 16 16" fill="currentColor">' +
+                  '<path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0z"/>' +
+                  '</svg>';
+              } else if (newType === 'error') {
+                newIconSvg =
+                  '<svg class="toast-icon" viewBox="0 0 16 16" fill="currentColor">' +
+                  '<path d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06z"/>' +
+                  '</svg>';
+              }
+              var iconEl = toast.querySelector('svg');
+              if (iconEl && newIconSvg) {
+                iconEl.outerHTML = newIconSvg;
+              }
+            }
+
+            // 如果指定了新的持续时间，则设置新的自动关闭定时器
+            if (newDuration > 0) {
+              autoCloseTimer = setTimeout(function () {
+                toast.classList.remove('show');
+                removeTimer = setTimeout(function () {
+                  if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                  }
+                }, 300);
+              }, newDuration);
+            }
+          },
+        };
+      };
 
       // 保存目录显示状态到utools
       var saveTocPreference = function (visible) {
@@ -492,12 +701,22 @@
       var downloadMd = function () {
         if (!currentMdText || typeof window.saveFile !== 'function') return;
         var fileName = 'markdown_' + Date.now() + '.md';
-        window.saveFile(fileName, currentMdText);
+        var result = window.saveFile(fileName, currentMdText);
+        if (result && result.success) {
+          showToast('Markdown 已保存至下载目录', 'success');
+        } else if (result && result.error) {
+          showToast('保存失败: ' + result.error, 'error');
+        }
       };
 
       var copyMarkdown = function () {
         if (!currentMdText || typeof window.copyText !== 'function') return;
-        window.copyText(currentMdText);
+        var result = window.copyText(currentMdText);
+        if (result && result.success) {
+          showToast('Markdown 已复制到剪贴板', 'success');
+        } else if (result && result.error) {
+          showToast('复制失败: ' + result.error, 'error');
+        }
       };
 
       var generateFullHtml = function (html, isDark) {
@@ -515,12 +734,20 @@
         var processedHtml = await renderMermaidForDownload(currentHtml);
         var fullHtml = generateFullHtml(processedHtml, currentIsDark);
         var fileName = 'markdown_' + Date.now() + '.html';
-        window.saveFile(fileName, fullHtml);
+        var result = window.saveFile(fileName, fullHtml);
+        if (result && result.success) {
+          showToast('HTML 已保存至下载目录', 'success');
+        } else if (result && result.error) {
+          showToast('保存失败: ' + result.error, 'error');
+        }
       };
 
       var downloadImage = async function () {
         const markdownBody = document.querySelector('.markdown-body');
         if (!markdownBody) return;
+
+        // 显示处理中提示
+        var toast = showToast('正在生成图片...', 'loading', 0);
 
         // 记录原始样式
         const originalPadding = markdownBody.style.padding;
@@ -544,9 +771,15 @@
             c.charCodeAt(0),
           );
           const fileName = 'markdown_' + Date.now() + '.png';
-          window.saveFile(fileName, buffer);
+          var result = window.saveFile(fileName, buffer);
+          if (result && result.success) {
+            toast.update('图片已保存至下载目录', 'success', 2000);
+          } else if (result && result.error) {
+            toast.update('保存失败: ' + result.error, 'error', 3000);
+          }
         } catch (e) {
           console.error('生成图片失败:', e);
+          toast.update('生成图片失败: ' + e.message, 'error', 3000);
         } finally {
           // 恢复原始样式
           markdownBody.style.padding = originalPadding;
@@ -557,6 +790,9 @@
       var copyImageToClipboard = async function () {
         const markdownBody = document.querySelector('.markdown-body');
         if (!markdownBody) return;
+
+        // 显示处理中提示
+        var toast = showToast('正在生成图片...', 'loading', 0);
 
         // 记录原始样式
         const originalPadding = markdownBody.style.padding;
@@ -575,10 +811,16 @@
           });
           const dataUrl = canvas.toDataURL('image/png');
           if (typeof window.copyImage === 'function') {
-            window.copyImage(dataUrl);
+            var result = window.copyImage(dataUrl);
+            if (result && result.success) {
+              toast.update('图片已复制到剪贴板', 'success', 2000);
+            } else if (result && result.error) {
+              toast.update('复制失败: ' + result.error, 'error', 3000);
+            }
           }
         } catch (e) {
           console.error('复制图片失败:', e);
+          toast.update('复制图片失败: ' + e.message, 'error', 3000);
         } finally {
           // 恢复原始样式
           markdownBody.style.padding = originalPadding;

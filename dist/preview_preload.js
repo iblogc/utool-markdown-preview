@@ -8,24 +8,32 @@ window.saveFile = (fileName, content) => {
     const downloadsPath = utools.getPath('downloads')
     const filePath = path.join(downloadsPath, fileName)
     fs.writeFileSync(filePath, content)
-    utools.showNotification(`文件已保存至: ${filePath}`)
     utools.shellShowItemInFolder(filePath)
-    return true
+    return { success: true, filePath }
   } catch (err) {
     console.error('保存文件失败:', err)
-    utools.showNotification('保存文件失败: ' + err.message)
-    return false
+    return { success: false, error: err.message }
   }
 }
 
 window.copyText = (text) => {
-  utools.copyText(text)
-  utools.showNotification('已复制到剪贴板')
+  try {
+    utools.copyText(text)
+    return { success: true }
+  } catch (err) {
+    console.error('复制文本失败:', err)
+    return { success: false, error: err.message }
+  }
 }
 
 window.copyImage = (dataUrl) => {
-  utools.copyImage(dataUrl)
-  utools.showNotification('图片已复制到剪贴板')
+  try {
+    utools.copyImage(dataUrl)
+    return { success: true }
+  } catch (err) {
+    console.error('复制图片失败:', err)
+    return { success: false, error: err.message }
+  }
 }
 
 // 监听主题变化
