@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>MarkdownLive - 专业在线预览工具</title>
+        <meta name="description" content="功能强大的在线 Markdown/HTML/SVG 预览工具，支持实时编辑、图表渲染、多格式导出">
+        <meta name="keywords" content="Markdown, 预览, 编辑器, HTML, SVG, Mermaid, 在线工具">
+
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Pro:wght@400;500;600&display=swap"
+            rel="stylesheet">
+
+        <!-- External Libraries -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css"
+            id="hljs-light">
+        <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" id="hljs-dark"
+            disabled>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+        <link rel="stylesheet" href="styles.css">
+
+        <!-- Favicon -->
+        <link rel="icon"
+            href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
+    </head>
+
+    <body class="light-theme">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14,2 14,8 20,8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10,9 9,9 8,9"></polyline>
+                        </svg>
+                    </div>
+                    <div class="brand-info">
+                        <h1 class="brand-name">MarkdownLive</h1>
+                        <p class="brand-tagline">专业预览工具</p>
+                    </div>
+                </div>
+
+                <div class="header-controls">
+                    <div class="control-group">
+                        <label for="contentType" class="control-label">格式</label>
+                        <select id="contentType" class="select-control">
+                            <option value="markdown">Markdown</option>
+                            <option value="html">HTML</option>
+                            <option value="svg">SVG</option>
+                        </select>
+                    </div>
+
+                    <select id="themeSelect" class="select-control" title="切换主题">
+                        <option value="dark">深色</option>
+                        <option value="light">浅色</option>
+                        <option value="github">GitHub</option>
+                        <option value="solarized">Solarized</option>
+                        <option value="nord">Nord</option>
+                        <option value="sepia">Sepia</option>
+                    </select>
+
+                    <button id="tocToggle" class="icon-button" title="切换目录">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="8" y1="6" x2="21" y2="6"></line>
+                            <line x1="8" y1="12" x2="21" y2="12"></line>
+                            <line x1="8" y1="18" x2="21" y2="18"></line>
+                            <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                            <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                        </svg>
+                    </button>
+
+                    <button id="fullscreenToggle" class="icon-button" title="全屏模式">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path
+                                d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3">
+                            </path>
+                        </svg>
+                    </button>
+
+                    <div class="header-divider"></div>
+
+                    <button id="downloadMd" class="export-button" title="下载 Markdown">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7,10 12,15 17,10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        <span>MD</span>
+                    </button>
+                    <button id="copyMd" class="export-button" title="复制 Markdown">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        <span>MD</span>
+                    </button>
+                    <button id="downloadImg" class="export-button" title="下载图片">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21,15 16,10 5,21"></polyline>
+                        </svg>
+                        <span>图片</span>
+                    </button>
+                    <button id="copyImg" class="export-button" title="复制图片">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        <span>图片</span>
+                    </button>
+                    <button id="downloadHtml" class="export-button" title="下载 HTML">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="16,18 22,12 16,6"></polyline>
+                            <polyline points="8,6 2,12 8,18"></polyline>
+                        </svg>
+                        <span>HTML</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="app-main">
+            <!-- Editor Panel -->
+            <section class="editor-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                        <span>编辑器</span>
+                    </div>
+                    <div class="section-actions">
+                        <button id="clearBtn" class="action-button" title="清空内容">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polyline points="3,6 5,6 21,6"></polyline>
+                                <path
+                                    d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6">
+                                </path>
+                            </svg>
+                        </button>
+                        <button id="importBtn" class="action-button" title="导入文件">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14,2 14,8 20,8"></polyline>
+                                <line x1="12" y1="18" x2="12" y2="12"></line>
+                                <polyline points="9,15 12,12 15,15"></polyline>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="editor-container">
+                    <div class="editor-wrapper">
+                        <textarea id="editor" class="editor-textarea" placeholder="开始输入您的内容...
+
+# 欢迎使用 MarkdownLive
+
+这是一个功能强大的在线预览工具，支持：
+
+## ✨ 核心功能
+- **实时预览** - 即时查看渲染效果
+- **多格式支持** - Markdown、HTML、SVG
+- **图表渲染** - 完整的 Mermaid 支持
+- **智能导出** - 多种格式一键导出
+
+## 📊 图表示例
+
+```mermaid
+graph TD
+    A[开始] --> B{选择格式}
+    B -->|Markdown| C[编写文档]
+    B -->|HTML| D[编写代码]
+    B -->|SVG| E[绘制图形]
+    C --> F[实时预览]
+    D --> F
+    E --> F
+    F --> G[导出分享]
+```
+
+## 🚀 快速开始
+
+1. 在左侧编辑器中输入内容
+2. 右侧实时查看预览效果
+3. 使用工具栏进行导出操作
+
+**开始创作吧！** 🎉"></textarea>
+                        <div class="editor-status">
+                            <span id="wordCount" class="status-item">0 字符</span>
+                            <span id="lineCount" class="status-item">1 行</span>
+                            <span id="autoSaveStatus" class="status-item">已保存</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Preview Panel -->
+            <section class="preview-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        <span>预览</span>
+                    </div>
+                    <div class="section-actions">
+                    </div>
+                </div>
+
+                <div class="preview-container">
+                    <!-- Table of Contents -->
+                    <aside id="tocSidebar" class="toc-sidebar">
+                        <div class="toc-header">
+                            <h3>目录</h3>
+                            <button id="tocCollapse" class="toc-collapse">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <polyline points="6,9 12,15 18,9"></polyline>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="toc-content">
+                            <ul id="tocList" class="toc-list"></ul>
+                            <div class="toc-empty">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.5">
+                                    <line x1="8" y1="6" x2="21" y2="6"></line>
+                                    <line x1="8" y1="12" x2="21" y2="12"></line>
+                                    <line x1="8" y1="18" x2="21" y2="18"></line>
+                                    <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                                    <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                                    <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                                </svg>
+                                <!-- <p>暂无标题</p> -->
+                            </div>
+                        </div>
+                    </aside>
+
+                    <!-- Preview Content -->
+                    <div class="preview-content-wrapper">
+                        <div id="previewContent" class="preview-content">
+                            <div class="preview-placeholder">
+                                <div class="placeholder-icon">
+                                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="1">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                </div>
+                                <h3>开始创作</h3>
+                                <p>在左侧编辑器中输入内容，这里将实时显示预览效果</p>
+                                <div class="placeholder-features">
+                                    <span class="feature-tag">Markdown</span>
+                                    <span class="feature-tag">HTML</span>
+                                    <span class="feature-tag">SVG</span>
+                                    <span class="feature-tag">Mermaid</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Toast Container -->
+        <div id="toastContainer" class="toast-container"></div>
+
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay" class="loading-overlay">
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+                <p>处理中...</p>
+            </div>
+        </div>
+
+        <!-- File Input -->
+        <input type="file" id="fileInput" accept=".md,.html,.svg,.txt" style="display: none;">
+
+        <script src="script.js"></script>
+    </body>
+
+</html>
